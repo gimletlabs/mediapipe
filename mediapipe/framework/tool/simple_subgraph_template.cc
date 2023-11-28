@@ -21,7 +21,7 @@
 namespace mediapipe {
 
 // clang-format off
-static const char binary_graph[] =
+static const char pbtxt_graph[] =
 #include "{{SUBGRAPH_INC_FILE_PATH}}"
     ;  // NOLINT(whitespace/semicolon)
 
@@ -30,9 +30,14 @@ class {{SUBGRAPH_CLASS_NAME}} : public Subgraph {
   absl::StatusOr<CalculatorGraphConfig> GetConfig(
         const SubgraphOptions& /*options*/) {
     CalculatorGraphConfig config;
+
+    // [GML] Modified to accept the pbtxt instead of a binary format.
+    bool ok = google::protobuf::TextFormat::ParseFromString(pbtxt_graph, &config);
+    // bool ok = config.ParseFromArray(binary_graph, sizeof(binary_graph) - 1);
+
     // Note: this is a binary protobuf serialization, and may include NUL
     // bytes. The trailing NUL added to the string literal should be excluded.
-    if (config.ParseFromArray(binary_graph, sizeof(binary_graph) - 1)) {
+    if (ok) {
       return config;
     } else {
       return absl::InternalError("Could not parse subgraph.");

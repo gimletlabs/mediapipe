@@ -97,6 +97,10 @@ def data_as_c_string(
         compatible_with = compatible_with,
     )
 
+# [GML] We bypass the binary graph generation, and just inject the text format into the template.
+# [GML] The simple subgraph_template.cc is modified accordingly.
+# [GML] This was done because node_options using external protobufs were not being processed
+# [GML] properly by the existing rule.
 def mediapipe_simple_subgraph(
         name,
         register_as,
@@ -120,16 +124,21 @@ def mediapipe_simple_subgraph(
       **kwargs: Remaining keyword args, forwarded to cc_library.
     """
     graph_base_name = name
-    mediapipe_binary_graph(
-        name = name + "_graph",
-        graph = graph,
-        output_name = graph_base_name + ".binarypb",
-        deps = deps,
-        testonly = testonly,
-    )
+
+    #mediapipe_binary_graph(
+    #    name = name + "_graph",
+    #    graph = graph,
+    #    output_name = graph_base_name + ".binarypb",
+    #    deps = deps,
+    #    testonly = testonly,
+    #    target_compatible_with = target_compatible_with,
+    #)
+
     data_as_c_string(
         name = name + "_inc",
-        srcs = [graph_base_name + ".binarypb"],
+        # [GML] Inject the pbtxt directly.
+        #srcs = [graph_base_name + ".binarypb"],
+        srcs = [graph],
         outs = [graph_base_name + ".inc"],
     )
 
