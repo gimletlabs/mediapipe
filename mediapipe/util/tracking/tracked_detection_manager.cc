@@ -93,7 +93,6 @@ std::vector<int> TrackedDetectionManager::UpdateDetectionLocation(
   }
   auto& detection = *detection_ptr->second;
   detection.set_bounding_box(bounding_box);
-  detection.set_last_updated_timestamp(timestamp);
 
   // It's required to do this here in addition to in AddDetection because during
   // fast motion, two or more detections of the same object could coexist since

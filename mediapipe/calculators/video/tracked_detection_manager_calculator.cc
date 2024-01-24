@@ -34,7 +34,7 @@ namespace {
 
 using ::mediapipe::NormalizedRect;
 
-constexpr int kDetectionUpdateTimeOutMS = 5000;
+constexpr int kDetectionUpdateTimeOutMS = 1000;
 constexpr char kDetectionsTag[] = "DETECTIONS";
 constexpr char kDetectionBoxesTag[] = "DETECTION_BOXES";
 constexpr char kDetectionListTag[] = "DETECTION_LIST";
@@ -268,11 +268,6 @@ absl::Status TrackedDetectionManagerCalculator::Process(CalculatorContext* cc) {
 
     for (const auto& detection_ptr : all_detections) {
       const auto& detection = *detection_ptr.second;
-      // Only output detections that are synced.
-      if (detection.last_updated_timestamp() <
-          cc->InputTimestamp().Microseconds() / 1000) {
-        continue;
-      }
       output_detections->emplace_back(
           GetAxisAlignedDetectionFromTrackedDetection(detection));
       output_boxes->emplace_back(detection.bounding_box());
