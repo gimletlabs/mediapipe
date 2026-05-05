@@ -24,7 +24,6 @@
 #include "mediapipe/framework/formats/motion/optical_flow_field_data.pb.h"
 #include "mediapipe/framework/port/opencv_imgproc_inc.h"
 #include "mediapipe/framework/port/status.h"
-#include "tensorflow/core/framework/tensor.h"
 
 namespace mediapipe {
 
@@ -66,10 +65,6 @@ class OpticalFlowField {
   // Returns the raw flow data.
   const cv::Mat& flow_data() const { return flow_data_; }
   cv::Mat& mutable_flow_data() { return flow_data_; }
-
-  // Converts from a tensorflow H x W x 2 float Tensor. The internal storage
-  // for the optical flow field is reallocated.
-  void CopyFromTensor(const tensorflow::Tensor& tensor);
 
   // Converts to/from associated proto.
   void SetFromProto(const OpticalFlowFieldData& proto);

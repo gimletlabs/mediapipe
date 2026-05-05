@@ -230,7 +230,6 @@ cc_library(
         "//mediapipe/gpu:gpu_buffer",
         "//mediapipe/util:render_data_cc_proto",
         "@com_google_absl//absl/status",
-        "@org_tensorflow//tensorflow/lite:framework",
     ],
     alwayslink = 1,
 )
@@ -297,13 +296,7 @@ cc_library(
         "//mediapipe/framework/port:ret_check",
         "//mediapipe/framework/port:status",
         "//mediapipe/util:render_data_cc_proto",
-        "@org_tensorflow//tensorflow/lite:framework",
-    ] + select({
-        ":ios_or_disable_gpu": [],
-        "//conditions:default": [
-            "@org_tensorflow//tensorflow/lite/delegates/gpu/gl:gl_buffer",
-        ],
-    }),
+    ],
     alwayslink = 1,
 )
 
@@ -376,7 +369,6 @@ cc_library(
         "//mediapipe/framework/formats:rect_cc_proto",
         "//mediapipe/framework/port:ret_check",
         "//mediapipe/framework/port:status",
-        "@org_tensorflow//tensorflow/lite:framework",
     ],
     alwayslink = 1,
 )
@@ -909,14 +901,7 @@ cc_library(
         "//mediapipe/framework/port:ret_check",
         "//mediapipe/framework/port:status",
         "//mediapipe/util:resource_util",
-        "@org_tensorflow//tensorflow/lite:framework",
-        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
-    ] + select({
-        ":ios_or_disable_gpu": [],
-        "//conditions:default": [
-            "@org_tensorflow//tensorflow/lite/delegates/gpu/gl:gl_buffer",
-        ],
-    }),
+    ],
     alwayslink = 1,
 )
 
@@ -928,13 +913,9 @@ cc_test(
         ":split_vector_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:calculator_runner",
-        "//mediapipe/framework/deps:file_path",
         "//mediapipe/framework/port:gtest_main",
-        "//mediapipe/framework/port:integral_types",
         "//mediapipe/framework/port:parse_text_proto",
         "//mediapipe/framework/tool:validate_type",
-        "@org_tensorflow//tensorflow/lite:framework",
-        "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
     ],
 )
 

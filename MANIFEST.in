@@ -6,5 +6,3 @@ include LICENSE
 include MANIFEST.in
 include README.md
 include requirements.txt
-
-recursive-include mediapipe/modules *.txt

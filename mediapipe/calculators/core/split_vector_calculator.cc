@@ -23,31 +23,8 @@
 #include "mediapipe/framework/formats/matrix.h"
 #include "mediapipe/framework/formats/rect.pb.h"
 #include "mediapipe/framework/formats/tensor.h"
-#include "tensorflow/lite/interpreter.h"
-
-#if !defined(MEDIAPIPE_DISABLE_GL_COMPUTE)
-#include "tensorflow/lite/delegates/gpu/gl/gl_buffer.h"
-#endif  // !defined(MEDIAPIPE_DISABLE_GL_COMPUTE)
 
 namespace mediapipe {
-
-// Example config:
-// node {
-//   calculator: "SplitTfLiteTensorVectorCalculator"
-//   input_stream: "tflitetensor_vector"
-//   output_stream: "tflitetensor_vector_range_0"
-//   output_stream: "tflitetensor_vector_range_1"
-//   options {
-//     [mediapipe.SplitVectorCalculatorOptions.ext] {
-//       ranges: { begin: 0 end: 1 }
-//       ranges: { begin: 1 end: 2 }
-//       element_only: false
-//     }
-//   }
-// }
-typedef SplitVectorCalculator<TfLiteTensor, false>
-    SplitTfLiteTensorVectorCalculator;
-REGISTER_CALCULATOR(SplitTfLiteTensorVectorCalculator);
 
 typedef SplitVectorCalculator<Tensor, true> SplitTensorVectorCalculator;
 REGISTER_CALCULATOR(SplitTensorVectorCalculator);
@@ -66,12 +43,6 @@ REGISTER_CALCULATOR(SplitNormalizedRectVectorCalculator);
 
 typedef SplitVectorCalculator<Matrix, false> SplitMatrixVectorCalculator;
 REGISTER_CALCULATOR(SplitMatrixVectorCalculator);
-
-#if !defined(MEDIAPIPE_DISABLE_GL_COMPUTE)
-typedef SplitVectorCalculator<::tflite::gpu::gl::GlBuffer, true>
-    MovableSplitGlBufferVectorCalculator;
-REGISTER_CALCULATOR(MovableSplitGlBufferVectorCalculator);
-#endif
 
 typedef SplitVectorCalculator<mediapipe::Detection, false>
     SplitDetectionVectorCalculator;

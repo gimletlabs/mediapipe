@@ -28,7 +28,6 @@
 #include "mediapipe/framework/formats/tensor.h"
 #include "mediapipe/gpu/gpu_buffer.h"
 #include "mediapipe/util/render_data.pb.h"
-#include "tensorflow/lite/interpreter.h"
 
 namespace mediapipe {
 
@@ -57,10 +56,6 @@ REGISTER_CALCULATOR(EndLoopRenderDataCalculator);
 typedef EndLoopCalculator<std::vector<::mediapipe::ClassificationList>>
     EndLoopClassificationListCalculator;
 REGISTER_CALCULATOR(EndLoopClassificationListCalculator);
-
-typedef EndLoopCalculator<std::vector<TfLiteTensor>>
-    EndLoopTfLiteTensorCalculator;
-REGISTER_CALCULATOR(EndLoopTfLiteTensorCalculator);
 
 typedef EndLoopCalculator<std::vector<::mediapipe::Detection>>
     EndLoopDetectionCalculator;

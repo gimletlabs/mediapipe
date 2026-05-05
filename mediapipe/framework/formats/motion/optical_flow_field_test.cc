@@ -26,7 +26,6 @@
 #include "mediapipe/framework/port/file_helpers.h"
 #include "mediapipe/framework/port/gtest.h"
 #include "mediapipe/framework/port/integral_types.h"
-#include "tensorflow/core/framework/tensor.h"
 
 namespace mediapipe {
 
@@ -62,31 +61,6 @@ TEST(OpticalFlowField, ConstructsAndSerializes) {
           from_proto.flow_data().at<cv::Point2f>(r, c);
       EXPECT_FLOAT_EQ(original_flow(r, c).x, flow_at_r_c.x);
       EXPECT_FLOAT_EQ(original_flow(r, c).y, flow_at_r_c.y);
-    }
-  }
-}
-
-TEST(OpticalFlowField, ConvertsFromTensorflow) {
-  const int height = 3;
-  const int width = 5;
-  // Construct a flow field with (dx, dy) = (r, c).
-  tensorflow::Tensor flow_tensor(tensorflow::DT_FLOAT, {height, width, 2});
-  auto eigen_flow = flow_tensor.tensor<float, 3>();
-  for (int r = 0; r < height; ++r) {
-    for (int c = 0; c < width; ++c) {
-      eigen_flow(r, c, 0) = r;
-      eigen_flow(r, c, 1) = c;
-    }
-  }
-  OpticalFlowField flow_field;
-  flow_field.CopyFromTensor(flow_tensor);
-  ASSERT_EQ(height, flow_field.height());
-  ASSERT_EQ(width, flow_field.width());
-  for (int r = 0; r < height; ++r) {
-    for (int c = 0; c < width; ++c) {
-      const auto& dx_dy = flow_field.flow_data().at<cv::Point2f>(r, c);
-      EXPECT_EQ(r, dx_dy.x);
-      EXPECT_EQ(c, dx_dy.y);
     }
   }
 }

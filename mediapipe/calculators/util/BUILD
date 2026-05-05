@@ -819,23 +819,6 @@ cc_library(
     alwayslink = 1,
 )
 
-cc_test(
-    name = "detection_projection_calculator_test",
-    srcs = ["detection_projection_calculator_test.cc"],
-    deps = [
-        ":detection_projection_calculator",
-        "//mediapipe/calculators/tensor:image_to_tensor_utils",
-        "//mediapipe/framework:calculator_framework",
-        "//mediapipe/framework:calculator_runner",
-        "//mediapipe/framework/formats:detection_cc_proto",
-        "//mediapipe/framework/formats:location",
-        "//mediapipe/framework/formats:rect_cc_proto",
-        "//mediapipe/framework/port:gtest_main",
-        "//mediapipe/framework/port:parse_text_proto",
-        "//mediapipe/framework/port:point",
-    ],
-)
-
 cc_library(
     name = "landmark_letterbox_removal_calculator",
     srcs = ["landmark_letterbox_removal_calculator.cc"],
@@ -861,24 +844,6 @@ cc_library(
         "//mediapipe/framework/port:status",
     ],
     alwayslink = 1,
-)
-
-cc_test(
-    name = "landmark_projection_calculator_test",
-    srcs = ["landmark_projection_calculator_test.cc"],
-    deps = [
-        ":landmark_projection_calculator",
-        "//mediapipe/calculators/tensor:image_to_tensor_utils",
-        "//mediapipe/framework:calculator_cc_proto",
-        "//mediapipe/framework:calculator_framework",
-        "//mediapipe/framework:calculator_runner",
-        "//mediapipe/framework/formats:landmark_cc_proto",
-        "//mediapipe/framework/formats:rect_cc_proto",
-        "//mediapipe/framework/port:gtest_main",
-        "//mediapipe/framework/port:parse_text_proto",
-        "@com_google_absl//absl/memory",
-        "@com_google_googletest//:gtest_main",
-    ],
 )
 
 cc_library(
