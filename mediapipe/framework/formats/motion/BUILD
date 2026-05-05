@@ -46,7 +46,6 @@ cc_library(
         "@com_google_absl//absl/log:absl_check",
         "@com_google_absl//absl/log:absl_log",
         "@com_google_absl//absl/strings",
-        "@org_tensorflow//tensorflow/core:framework",
     ],
     alwayslink = 1,
 )
@@ -65,6 +64,5 @@ cc_test(
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/log:absl_check",
         "@com_google_absl//absl/log:absl_log",
-        "@org_tensorflow//tensorflow/core:framework",
     ],
 )

@@ -22,11 +22,6 @@
 #include "mediapipe/framework/formats/tensor.h"
 #include "mediapipe/framework/port/integral_types.h"
 #include "mediapipe/util/render_data.pb.h"
-#include "tensorflow/lite/interpreter.h"
-
-#if !defined(MEDIAPIPE_DISABLE_GL_COMPUTE)
-#include "tensorflow/lite/delegates/gpu/gl/gl_buffer.h"
-#endif  // !defined(MEDIAPIPE_DISABLE_GL_COMPUTE)
 
 namespace mediapipe {
 
@@ -60,17 +55,6 @@ typedef ConcatenateVectorCalculator<std::string>
     ConcatenateStringVectorCalculator;
 MEDIAPIPE_REGISTER_NODE(ConcatenateStringVectorCalculator);
 
-// Example config:
-// node {
-//   calculator: "ConcatenateTfLiteTensorVectorCalculator"
-//   input_stream: "tflitetensor_vector_1"
-//   input_stream: "tflitetensor_vector_2"
-//   output_stream: "concatenated_tflitetensor_vector"
-// }
-typedef ConcatenateVectorCalculator<TfLiteTensor>
-    ConcatenateTfLiteTensorVectorCalculator;
-MEDIAPIPE_REGISTER_NODE(ConcatenateTfLiteTensorVectorCalculator);
-
 typedef ConcatenateVectorCalculator<Tensor> ConcatenateTensorVectorCalculator;
 MEDIAPIPE_REGISTER_NODE(ConcatenateTensorVectorCalculator);
 
@@ -94,12 +78,6 @@ MEDIAPIPE_REGISTER_NODE(ConcatenateLandmarListVectorCalculator);
 typedef ConcatenateVectorCalculator<mediapipe::ClassificationList>
     ConcatenateClassificationListVectorCalculator;
 MEDIAPIPE_REGISTER_NODE(ConcatenateClassificationListVectorCalculator);
-
-#if !defined(MEDIAPIPE_DISABLE_GL_COMPUTE)
-typedef ConcatenateVectorCalculator<::tflite::gpu::gl::GlBuffer>
-    ConcatenateGlBufferVectorCalculator;
-MEDIAPIPE_REGISTER_NODE(ConcatenateGlBufferVectorCalculator);
-#endif
 
 typedef ConcatenateVectorCalculator<mediapipe::RenderData>
     ConcatenateRenderDataVectorCalculator;

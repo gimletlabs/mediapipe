@@ -68,7 +68,7 @@ http_archive(
     ],
 )
 
-# Load Zlib before initializing TensorFlow and the iOS build rules to guarantee
+# Load Zlib before initializing the iOS build rules to guarantee
 # that the target @zlib//:mini_zlib is available
 http_archive(
     name = "zlib",
@@ -245,21 +245,6 @@ http_archive(
     urls = [
         "https://github.com/s-yata/darts-clone/archive/e40ce4627526985a7767444b6ed6893ab6ff8983.zip",
     ],
-)
-
-http_archive(
-    name = "org_tensorflow_text",
-    sha256 = "f64647276f7288d1b1fe4c89581d51404d0ce4ae97f2bcc4c19bd667549adca8",
-    strip_prefix = "text-2.2.0",
-    urls = [
-        "https://github.com/tensorflow/text/archive/v2.2.0.zip",
-    ],
-    patches = [
-        "@//third_party:tensorflow_text_remove_tf_deps.diff",
-        "@//third_party:tensorflow_text_a0f49e63.diff",
-    ],
-    patch_args = ["-p1"],
-    repo_mapping = {"@com_google_re2": "@com_googlesource_code_re2"},
 )
 
 http_archive(
@@ -469,64 +454,6 @@ maven_install(
     fetch_sources = True,
     version_conflict_policy = "pinned",
 )
-
-# Needed by TensorFlow
-http_archive(
-    name = "io_bazel_rules_closure",
-    sha256 = "e0a111000aeed2051f29fcc7a3f83be3ad8c6c93c186e64beb1ad313f0c7f9f9",
-    strip_prefix = "rules_closure-cf1e44edb908e9616030cc83d085989b8e6cd6df",
-    urls = [
-        "http://mirror.tensorflow.org/github.com/bazelbuild/rules_closure/archive/cf1e44edb908e9616030cc83d085989b8e6cd6df.tar.gz",
-        "https://github.com/bazelbuild/rules_closure/archive/cf1e44edb908e9616030cc83d085989b8e6cd6df.tar.gz",  # 2019-04-04
-    ],
-)
-
-# TensorFlow repo should always go after the other external dependencies.
-# TF on 2023-07-26.
-_TENSORFLOW_GIT_COMMIT = "e92261fd4cec0b726692081c4d2966b75abf31dd"
-# curl -L https://github.com/tensorflow/tensorflow/archive/<TENSORFLOW_GIT_COMMIT>.tar.gz | shasum -a 256
-_TENSORFLOW_SHA256 = "478a229bd4ec70a5b568ac23b5ea013d9fca46a47d6c43e30365a0412b9febf4"
-http_archive(
-    name = "org_tensorflow",
-    urls = [
-      "https://github.com/tensorflow/tensorflow/archive/%s.tar.gz" % _TENSORFLOW_GIT_COMMIT,
-    ],
-    patches = [
-        "@//third_party:org_tensorflow_compatibility_fixes.diff",
-        "@//third_party:org_tensorflow_system_python.diff",
-        # Diff is generated with a script, don't update it manually.
-        "@//third_party:org_tensorflow_custom_ops.diff",
-    ],
-    patch_args = [
-        "-p1",
-    ],
-    strip_prefix = "tensorflow-%s" % _TENSORFLOW_GIT_COMMIT,
-    sha256 = _TENSORFLOW_SHA256,
-)
-
-load("@org_tensorflow//tensorflow:workspace3.bzl", "tf_workspace3")
-tf_workspace3()
-load("@org_tensorflow//tensorflow:workspace2.bzl", "tf_workspace2")
-tf_workspace2()
-
-# Edge TPU
-http_archive(
-  name = "libedgetpu",
-  sha256 = "14d5527a943a25bc648c28a9961f954f70ba4d79c0a9ca5ae226e1831d72fe80",
-  strip_prefix = "libedgetpu-3164995622300286ef2bb14d7fdc2792dae045b7",
-  urls = [
-    "https://github.com/google-coral/libedgetpu/archive/3164995622300286ef2bb14d7fdc2792dae045b7.tar.gz"
-  ],
-)
-load("@libedgetpu//:workspace.bzl", "libedgetpu_dependencies")
-libedgetpu_dependencies()
-
-load("@coral_crosstool//:configure.bzl", "cc_crosstool")
-cc_crosstool(name = "crosstool")
-
-load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
-rules_proto_dependencies()
-rules_proto_toolchains()
 
 load("@//third_party:external_files.bzl", "external_files")
 external_files()

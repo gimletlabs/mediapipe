@@ -43,7 +43,6 @@ bzl_library(
         "//mediapipe/framework:transitive_protos_bzl",
         "//mediapipe/framework/deps:descriptor_set_bzl",
         "//mediapipe/framework/deps:expand_template_bzl",
-        "@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite_bzl",
     ],
 )
 

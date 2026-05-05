@@ -147,22 +147,6 @@ void OpticalFlowField::Resize(int new_width, int new_height) {
   }
 }
 
-void OpticalFlowField::CopyFromTensor(const tensorflow::Tensor& tensor) {
-  ABSL_CHECK_EQ(tensorflow::DT_FLOAT, tensor.dtype());
-  ABSL_CHECK_EQ(3, tensor.dims()) << "Tensor must be height x width x 2.";
-  ABSL_CHECK_EQ(2, tensor.dim_size(2)) << "Tensor must be height x width x 2.";
-  const int height = tensor.dim_size(0);
-  const int width = tensor.dim_size(1);
-  Allocate(width, height);
-  typename tensorflow::TTypes<float, 3>::ConstTensor input_flow =
-      tensor.shaped<float, 3>({height, width, 2});
-  for (int r = 0; r < height; ++r) {
-    for (int c = 0; c < width; ++c) {
-      flow_data_(r, c) = cv::Point2f(input_flow(r, c, 0), input_flow(r, c, 1));
-    }
-  }
-}
-
 void OpticalFlowField::SetFromProto(const OpticalFlowFieldData& proto) {
   ABSL_CHECK_EQ(proto.width() * proto.height(), proto.dx_size());
   ABSL_CHECK_EQ(proto.width() * proto.height(), proto.dy_size());

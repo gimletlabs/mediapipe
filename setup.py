@@ -132,10 +132,8 @@ def _add_mp_init_files():
   shutil.copyfile(MP_DIR_INIT_PY, _get_backup_file(MP_DIR_INIT_PY))
   mp_dir_init_file = open(MP_DIR_INIT_PY, 'a')
   mp_dir_init_file.writelines([
-      '\n', 'from mediapipe.python import *\n',
-      'import mediapipe.python.solutions as solutions \n',
-      'import mediapipe.tasks.python as tasks\n', '\n\n', 'del framework\n',
-      'del gpu\n', 'del modules\n', 'del python\n', 'del mediapipe\n',
+      '\n', 'from mediapipe.python import *\n', '\n\n', 'del framework\n',
+      'del gpu\n', 'del python\n', 'del mediapipe\n',
       'del util\n', '__version__ = \'{}\''.format(__version__), '\n'
   ])
   mp_dir_init_file.close()
@@ -177,9 +175,7 @@ class GeneratePyProtos(build_ext.build_ext):
 
     # Add __init__.py to mediapipe proto directories to make the py protos
     # indexable.
-    proto_dirs = ['mediapipe/calculators'] + [
-        x[0] for x in os.walk('mediapipe/modules')
-    ] + [x[0] for x in os.walk('mediapipe/tasks/cc')]
+    proto_dirs = ['mediapipe/calculators']
     for proto_dir in proto_dirs:
       self._add_empty_init_file(
           os.path.abspath(
@@ -189,15 +185,11 @@ class GeneratePyProtos(build_ext.build_ext):
     # Build framework and calculator py protos.
     for pattern in [
         'mediapipe/framework/**/*.proto', 'mediapipe/calculators/**/*.proto',
-        'mediapipe/gpu/**/*.proto', 'mediapipe/modules/**/*.proto',
-        'mediapipe/tasks/cc/**/*.proto', 'mediapipe/util/**/*.proto'
+        'mediapipe/gpu/**/*.proto', 'mediapipe/util/**/*.proto'
     ]:
       for proto_file in glob.glob(pattern, recursive=True):
         # Ignore test protos.
         if proto_file.endswith('test.proto'):
-          continue
-        # Ignore tensorflow protos in mediapipe/calculators/tensorflow.
-        if 'tensorflow' in proto_file:
           continue
         # Ignore testdata dir.
         if 'testdata' in proto_file:
@@ -225,120 +217,6 @@ class GeneratePyProtos(build_ext.build_ext):
           '--python_out=' + os.path.abspath(self.build_lib), source
       ]
       _invoke_shell_command(protoc_command)
-
-
-class BuildModules(build_ext.build_ext):
-  """Build binary graphs and download external files of various MediaPipe modules."""
-
-  user_options = build_ext.build_ext.user_options + [
-      ('link-opencv', None, 'if true, build opencv from source.'),
-  ]
-  boolean_options = build_ext.build_ext.boolean_options + ['link-opencv']
-
-  def initialize_options(self):
-    self.link_opencv = False
-    build_ext.build_ext.initialize_options(self)
-
-  def finalize_options(self):
-    build_ext.build_ext.finalize_options(self)
-
-  def run(self):
-    _check_bazel()
-    external_files = [
-        'face_detection/face_detection_full_range_sparse.tflite',
-        'face_detection/face_detection_short_range.tflite',
-        'face_landmark/face_landmark.tflite',
-        'face_landmark/face_landmark_with_attention.tflite',
-        'hand_landmark/hand_landmark_full.tflite',
-        'hand_landmark/hand_landmark_lite.tflite',
-        'holistic_landmark/hand_recrop.tflite',
-        'iris_landmark/iris_landmark.tflite',
-        'palm_detection/palm_detection_full.tflite',
-        'palm_detection/palm_detection_lite.tflite',
-        'pose_detection/pose_detection.tflite',
-        'pose_landmark/pose_landmark_full.tflite',
-        'selfie_segmentation/selfie_segmentation.tflite',
-        'selfie_segmentation/selfie_segmentation_landscape.tflite',
-    ]
-    for elem in external_files:
-      external_file = os.path.join('mediapipe/modules/', elem)
-      sys.stderr.write('downloading file: %s\n' % external_file)
-      self._download_external_file(external_file)
-
-    binary_graphs = [
-        'face_detection/face_detection_short_range_cpu',
-        'face_detection/face_detection_full_range_cpu',
-        'face_landmark/face_landmark_front_cpu',
-        'hand_landmark/hand_landmark_tracking_cpu',
-        'holistic_landmark/holistic_landmark_cpu', 'objectron/objectron_cpu',
-        'pose_landmark/pose_landmark_cpu',
-        'selfie_segmentation/selfie_segmentation_cpu'
-    ]
-    for elem in binary_graphs:
-      binary_graph = os.path.join('mediapipe/modules/', elem)
-      sys.stderr.write('generating binarypb: %s\n' % binary_graph)
-      self._generate_binary_graph(binary_graph)
-
-  def _download_external_file(self, external_file):
-    """Download an external file from GCS via Bazel."""
-
-    fetch_model_command = [
-        'bazel',
-        'build',
-        external_file,
-    ]
-    _invoke_shell_command(fetch_model_command)
-    _copy_to_build_lib_dir(self.build_lib, external_file)
-
-  def _generate_binary_graph(self, binary_graph_target):
-    """Generate binary graph for a particular MediaPipe binary graph target."""
-
-    bazel_command = [
-        'bazel',
-        'build',
-        '--compilation_mode=opt',
-        '--copt=-DNDEBUG',
-        '--action_env=PYTHON_BIN_PATH=' + _normalize_path(sys.executable),
-        binary_graph_target,
-    ] + GPU_OPTIONS
-
-    if not self.link_opencv and not IS_WINDOWS:
-      bazel_command.append('--define=OPENCV=source')
-
-    _invoke_shell_command(bazel_command)
-    _copy_to_build_lib_dir(self.build_lib, binary_graph_target + '.binarypb')
-
-
-class GenerateMetadataSchema(build_ext.build_ext):
-  """Generate metadata python schema files."""
-
-  def run(self):
-    for target in [
-        'image_segmenter_metadata_schema_py',
-        'metadata_schema_py',
-        'object_detector_metadata_schema_py',
-        'schema_py',
-    ]:
-
-      bazel_command = [
-          'bazel',
-          'build',
-          '--compilation_mode=opt',
-          '--action_env=PYTHON_BIN_PATH=' + _normalize_path(sys.executable),
-          '//mediapipe/tasks/metadata:' + target,
-      ] + GPU_OPTIONS
-
-      _invoke_shell_command(bazel_command)
-      _copy_to_build_lib_dir(
-          self.build_lib,
-          'mediapipe/tasks/metadata/' + target + '_generated.py')
-    for schema_file in [
-        'mediapipe/tasks/metadata/metadata_schema.fbs',
-        'mediapipe/tasks/metadata/object_detector_metadata_schema.fbs',
-        'mediapipe/tasks/metadata/image_segmenter_metadata_schema.fbs',
-    ]:
-      shutil.copyfile(schema_file,
-                      os.path.join(self.build_lib + '/', schema_file))
 
 
 class BazelExtension(setuptools.Extension):
@@ -452,13 +330,9 @@ class BuildPy(build_py.build_py):
   def run(self):
     _modify_opencv_cmake_rule(self.link_opencv)
     _add_mp_init_files()
-    build_modules_obj = self.distribution.get_command_obj('build_modules')
-    build_modules_obj.link_opencv = self.link_opencv
     build_ext_obj = self.distribution.get_command_obj('build_ext')
     build_ext_obj.link_opencv = self.link_opencv
     self.run_command('gen_protos')
-    self.run_command('generate_metadata_schema')
-    self.run_command('build_modules')
     self.run_command('build_ext')
     build_py.build_py.run(self)
     self.run_command('restore')
@@ -518,24 +392,17 @@ setuptools.setup(
     long_description=_get_long_description(),
     long_description_content_type='text/markdown',
     packages=setuptools.find_packages(
-        exclude=['mediapipe.examples.desktop.*', 'mediapipe.model_maker.*']),
+        exclude=['mediapipe.examples.desktop.*']),
     install_requires=_parse_requirements('requirements.txt'),
     cmdclass={
         'build_py': BuildPy,
-        'build_modules': BuildModules,
         'build_ext': BuildExtension,
-        'generate_metadata_schema': GenerateMetadataSchema,
         'gen_protos': GeneratePyProtos,
         'install': Install,
         'restore': Restore,
     },
     ext_modules=[
         BazelExtension('//mediapipe/python:_framework_bindings'),
-        BazelExtension(
-            '//mediapipe/tasks/cc/metadata/python:_pywrap_metadata_version'),
-        BazelExtension(
-            '//mediapipe/tasks/python/metadata/flatbuffers_lib:_pywrap_flatbuffers'
-        ),
     ],
     zip_safe=False,
     include_package_data=True,

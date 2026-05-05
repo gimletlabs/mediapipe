@@ -576,15 +576,6 @@ mediapipe_proto_library(
     ],
 )
 
-mediapipe_proto_library(
-    name = "feature_detector_calculator_proto",
-    srcs = ["feature_detector_calculator.proto"],
-    deps = [
-        "//mediapipe/framework:calculator_options_proto",
-        "//mediapipe/framework:calculator_proto",
-    ],
-)
-
 cc_library(
     name = "mask_overlay_calculator",
     srcs = ["mask_overlay_calculator.cc"],
@@ -596,32 +587,6 @@ cc_library(
         "//mediapipe/gpu:gl_calculator_helper",
         "//mediapipe/gpu:gl_simple_shaders",
         "//mediapipe/gpu:shader_util",
-    ],
-    alwayslink = 1,
-)
-
-cc_library(
-    name = "feature_detector_calculator",
-    srcs = ["feature_detector_calculator.cc"],
-    deps = [
-        ":feature_detector_calculator_cc_proto",
-        "//mediapipe/framework:calculator_framework",
-        "//mediapipe/framework/formats:image_frame",
-        "//mediapipe/framework/formats:image_frame_opencv",
-        "//mediapipe/framework/formats:landmark_cc_proto",
-        "//mediapipe/framework/formats:video_stream_header",
-        "//mediapipe/framework/port:integral_types",
-        "//mediapipe/framework/port:logging",
-        "//mediapipe/framework/port:opencv_core",
-        "//mediapipe/framework/port:opencv_features2d",
-        "//mediapipe/framework/port:opencv_imgproc",
-        "//mediapipe/framework/port:ret_check",
-        "//mediapipe/framework/port:status",
-        "//mediapipe/framework/port:threadpool",
-        "//mediapipe/framework/tool:options_util",
-        "@com_google_absl//absl/memory",
-        "@com_google_absl//absl/synchronization",
-        "@org_tensorflow//tensorflow/lite:framework",
     ],
     alwayslink = 1,
 )
@@ -792,61 +757,6 @@ cc_library(
         "//conditions:default": [":affine_transformation_runner_opencv"],
     }),
     alwayslink = 1,
-)
-
-cc_test(
-    name = "warp_affine_calculator_test",
-    srcs = ["warp_affine_calculator_test.cc"],
-    data = [
-        "//mediapipe/calculators/tensor:testdata/image_to_tensor/input.jpg",
-        "//mediapipe/calculators/tensor:testdata/image_to_tensor/large_sub_rect.png",
-        "//mediapipe/calculators/tensor:testdata/image_to_tensor/large_sub_rect_border_zero.png",
-        "//mediapipe/calculators/tensor:testdata/image_to_tensor/large_sub_rect_keep_aspect.png",
-        "//mediapipe/calculators/tensor:testdata/image_to_tensor/large_sub_rect_keep_aspect_border_zero.png",
-        "//mediapipe/calculators/tensor:testdata/image_to_tensor/large_sub_rect_keep_aspect_with_rotation.png",
-        "//mediapipe/calculators/tensor:testdata/image_to_tensor/large_sub_rect_keep_aspect_with_rotation_border_zero.png",
-        "//mediapipe/calculators/tensor:testdata/image_to_tensor/medium_sub_rect_keep_aspect.png",
-        "//mediapipe/calculators/tensor:testdata/image_to_tensor/medium_sub_rect_keep_aspect_border_zero.png",
-        "//mediapipe/calculators/tensor:testdata/image_to_tensor/medium_sub_rect_keep_aspect_with_rotation.png",
-        "//mediapipe/calculators/tensor:testdata/image_to_tensor/medium_sub_rect_keep_aspect_with_rotation_border_zero.png",
-        "//mediapipe/calculators/tensor:testdata/image_to_tensor/medium_sub_rect_with_rotation.png",
-        "//mediapipe/calculators/tensor:testdata/image_to_tensor/medium_sub_rect_with_rotation_border_zero.png",
-        "//mediapipe/calculators/tensor:testdata/image_to_tensor/medium_sub_rect_with_rotation_border_zero_interp_cubic.png",
-        "//mediapipe/calculators/tensor:testdata/image_to_tensor/noop_except_range.png",
-    ],
-    tags = [
-        "desktop_only_test",
-        "not_run:arm",
-    ],
-    deps = [
-        ":affine_transformation",
-        ":image_transformation_calculator",
-        ":warp_affine_calculator",
-        "//mediapipe/calculators/tensor:image_to_tensor_converter",
-        "//mediapipe/calculators/tensor:image_to_tensor_utils",
-        "//mediapipe/calculators/util:from_image_calculator",
-        "//mediapipe/calculators/util:to_image_calculator",
-        "//mediapipe/framework:calculator_framework",
-        "//mediapipe/framework:calculator_runner",
-        "//mediapipe/framework/deps:file_path",
-        "//mediapipe/framework/formats:image",
-        "//mediapipe/framework/formats:image_format_cc_proto",
-        "//mediapipe/framework/formats:image_frame",
-        "//mediapipe/framework/formats:image_frame_opencv",
-        "//mediapipe/framework/formats:rect_cc_proto",
-        "//mediapipe/framework/formats:tensor",
-        "//mediapipe/framework/port:gtest_main",
-        "//mediapipe/framework/port:integral_types",
-        "//mediapipe/framework/port:opencv_core",
-        "//mediapipe/framework/port:opencv_imgcodecs",
-        "//mediapipe/framework/port:opencv_imgproc",
-        "//mediapipe/framework/port:parse_text_proto",
-        "//mediapipe/gpu:gpu_buffer_to_image_frame_calculator",
-        "//mediapipe/gpu:image_frame_to_gpu_buffer_calculator",
-        "@com_google_absl//absl/flags:flag",
-        "@com_google_absl//absl/memory",
-        "@com_google_absl//absl/strings",
-    ],
 )
 
 cc_library(
