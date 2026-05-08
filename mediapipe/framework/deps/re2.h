@@ -16,6 +16,7 @@
 #define MEDIAPIPE_FRAMEWORK_DEPS_RE2_H_
 
 #include <regex>  // NOLINT
+#include <mutex>
 
 namespace mediapipe {
 
